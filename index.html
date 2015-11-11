@@ -172,9 +172,19 @@
         }
 
         var refresh = function(){
-          /* Get total event counts */
-            var query = MP.api.query('/api/2.0/events/', {event:events, unit: 'minute', union: 1, type:'unique'}, {dataType: 'json'})
-            query.done(function(json) {
+          /* 
+              Get total event counts 
+              event:App Open
+              type:general
+              limit:255
+              on:properties["First App Open"]
+              to_date:2015-11-11
+              from_date:2015-10-13
+              unit:day
+          */
+            var downloadsQuery = MP.api.query('/api/2.0/events/', {event:'App Open', unit: 'week',type:'unique'})
+            downloadsQuery.done(function(json) {
+              console.log(json);
               var values = json.data.values;
               var data = _.values(json.data.values)[0];
 
