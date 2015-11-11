@@ -182,7 +182,7 @@
               from_date:2015-10-13
               unit:day
           */
-            var downloadsQuery = MP.api.query('/api/2.0/events/', {event:'App Open', unit: 'week',type:'unique'})
+            var downloadsQuery = MP.api.query('/api/2.0/segmentation/', {event:'App Open', unit: 'week',type:'unique'})
             downloadsQuery.done(function(json) {
               console.log(json);
               var values = json.data.values;
