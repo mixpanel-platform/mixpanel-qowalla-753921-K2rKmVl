@@ -228,7 +228,7 @@
                 $('.monthly-actives').text(addCommas(monthlyActives));
             });
 
-            var dailyQuery = MP.api.query('/api/2.0/events/', {event:["Licensed Content Purchase","Purchase"], unit: 'day', union: 1, interval:1, type:'unique'}, {dataType: 'json'});
+            var dailyQuery = MP.api.query('/api/2.0/events/', {event:["Licensed Content Purchase","Purchase"], unit: 'week', interval:1}, {dataType: 'json'});
             dailyQuery.done(function(json){
 
                 var data = _.values(json.data.values)[0];
