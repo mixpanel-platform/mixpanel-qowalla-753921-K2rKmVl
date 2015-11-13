@@ -119,7 +119,7 @@
                                 <table id="datatable1" class="table table-striped table-hover dataTable no-footer" role="grid" aria-describedby="datatable1_info">
                               	  <thead>
 	                                <tr role="row">
-	                                  <th class="sorting_asc" tabindex="0" aria-controls="datatable1" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending" style="width: 161px;"> Events</th>
+	                                  <th class="sorting_asc" tabindex="0" aria-controls="datatable1" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending" style="width: 161px;"> Metrics</th>
 	                                  <th class="sorting" tabindex="0" aria-controls="datatable1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending" style="width: 237px;">Current Week</th>
 	                                  <th class="sorting" tabindex="0" aria-controls="datatable1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending" style="width: 237px;">Previous Week</th>
 	                                  <th class="sorting" tabindex="0" aria-controls="datatable1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending" style="width: 237px;">Difference</th>
@@ -252,64 +252,74 @@
             $('.date-time').text(time);
             $('.date-pm').text(ampm);
 
-            var pageViewParams = {limit: 25, type:'unique', unit:'minute', from: moment(), to: moment()}
-            var pageViewQuery = MP.api.segment('Page View', 'Url', pageViewParams)
-
-            pageViewQuery.done(function(results){
-                var data = {}
-                _.each(_.keys(results.values()), function(key){
+            var table = $('#datatable1').DataTable();
+            table.clear();
+            /* iOS and Android Downloads 
+            
+            */
+            var platformDownloads = MP.api.segment('App Open', '$os', {where: 'properties["First App Open"] == true', from: moment().subtract(14, 'days'), unit:'week'});
+            platformDownloads.done(function(results){
+              
+                console.log(results.values());
+                var values = _.keys(results.values());
+                _.each(values, function(value){
+                    dates = results.values()[value];
                     /* sum over data in value of results.values()[key] */
-                    var keyData = results.values()[key];
-                    var sortedKeys = _.keys(keyData)
-
-                    /* sort and reverse */
-                    sortedKeys.sort()
-                    sortedKeys.reverse()
-
-                    var current = 0
-                    var lastMinute = 0
-                    var count = 0
-
-                    while (count <= sortedKeys.length) {
-                        if (keyData[sortedKeys[count]] > 0) {
-                            console.log(sortedKeys[count])
-                            console.log(sortedKeys[count + 1])
-                            current = keyData[sortedKeys[count]]
-                            try {
-                                lastMinute = keyData[sortedKeys[count + 1]]
-                            } catch (err){
-                                lastMinute = keyData[sortedKeys[0]]
-                            }
-                            break;
-                        }
-                        count ++
-                    }
                     
-                    var totalCurrentUsers = current + lastMinute;
-                    data[toTitleCase(key.replace("/ffl/",""))] = totalCurrentUsers
-                });
-
-
-                var table = $('#datatable1').DataTable();
-
-                /* Clear it before we Draw Again */
-
-                table.clear();
-
-                /* Draw new Rows */
-
-                _.each(_.keys(data), function(datum){
-                    table.row.add([datum,data[datum]]).draw(false);
-                });
-
-                /* Sort by second column */
-                table.order([1, 'desc']).draw();
+                    var sortedDates = _.keys(dates)
+                    var difference = 0;
+                    /* sort and reverse */
+                    sortedDates.sort();
+                    sortedDates.reverse();
+                    console.log(sortedDates)
+                    var currentWeek = dates[sortedDates[0]];
+                    var previousWeek = dates[sortedDates[1]];
+                    if (currentWeek != 0 && previousWeek != 0){
+                        var difference = (currentWeek/previousWeek);
+                    }
+                    table.row.add([value + ' Downloads', currentWeek, previousWeek, difference.toFixed(2) + ' %']).draw(false);
+                })
+            });   
+            
+            var totalPurchases = MP.api.segment('Purchase', '$os', {from: moment().subtract(14, 'days'), unit:'week'});
+            totalPurchases.done(function(results){
+              
+                console.log(results.values());
+                var values = _.keys(results.values());
+                _.each(values, function(value){
+                    dates = results.values()[value];
+                    /* sum over data in value of results.values()[key] */
+                    
+                    var sortedDates = _.keys(dates)
+                    var difference = 0;
+                    /* sort and reverse */
+                    sortedDates.sort();
+                    sortedDates.reverse();
+                    console.log(sortedDates)
+                    var currentWeek = dates[sortedDates[0]];
+                    var previousWeek = dates[sortedDates[1]];
+                    if (currentWeek != 0 && previousWeek != 0){
+                        var difference = (currentWeek/previousWeek)*100;
+                    }
+                    table.row.add([value + ' Purchases', currentWeek, previousWeek, difference + ' %']).draw(false);
+                })
+            });   
+            
+            
+            
+            
+            /*
+              _.each(_.keys(data), function(datum){
+                table.row.add([datum,data[datum]]).draw(false);
             });
-
+            
+            Sort by second column */
+            table.order([0, 'desc']).draw();
+           
 
         }
 
-        setInterval(refresh, 30000);
+        setInterval(refresh, 100000);
 
         function pad(d) {
             return (d < 10) ? '0' + d.toString() : d.toString();
