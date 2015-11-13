@@ -310,10 +310,27 @@
             
             var purchases = MP.api.events('Licensed Content Purchases', 'Total Content Purchases', {from: moment().subtract(14, 'days'), unit: 'week'})
             purchases.done(function(results) {
-                console.log('got results', results.values());
+                var values = _.keys(results.values())
+                _.each(values, function(value){
+                    dates = results.values()[value];
+                    /* sum over data in value of results.values()[key] */
+                    
+                    var sortedDates = _.keys(dates)
+                    var difference = 0;
+                    /* sort and reverse */
+                    sortedDates.sort();
+                    sortedDates.reverse();
+                    console.log(sortedDates)
+                    var currentWeek = dates[sortedDates[0]];
+                    var previousWeek = dates[sortedDates[1]];
+                    if (currentWeek != 0 && previousWeek != 0){
+                        var difference = (currentWeek/previousWeek)*100;
+                    }
+                    table.row.add([value, currentWeek, previousWeek, difference + ' %']).draw(false);
+                })
             });
             
-            table.order([0, 'desc']).draw();
+            table.order([0, 'asc']).draw();
            
 
         }
