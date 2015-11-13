@@ -186,7 +186,7 @@
               console.log(json);
               var values = json.data.values;
               var data = _.values(json.data.values)[0];
-
+              conso
               /* iterate through the keys in the values dictionary in reverse order.  grab the first and second that have data*/
               var sortedKeys = _.keys(data)
 
@@ -226,8 +226,9 @@
 
                 $('.monthly-actives').text(addCommas(monthlyActives));
             });
-
-            var dailyQuery = MP.api.query('/api/2.0/events/', {event:["Licensed Content Purchase","Purchase"], unit: 'week', interval:1, union:1}, {dataType: 'json'});
+            
+            /* Year to Date Purchases */
+            var dailyQuery = MP.api.query('/api/2.0/events/', {event:["Licensed Content Purchase","Purchase"], unit: 'year', interval:1, union:1}, {dataType: 'json'});
             dailyQuery.done(function(json){
 
                 var data = _.values(json.data.values)[0];
@@ -259,13 +260,12 @@
             */
             var platformDownloads = MP.api.segment('App Open', '$os', {where: 'properties["First App Open"] == true', from: moment().subtract(14, 'days'), unit:'week'});
             platformDownloads.done(function(results){
-              
-                console.log(results.values());
+
                 var values = _.keys(results.values());
                 _.each(values, function(value){
                     dates = results.values()[value];
                     /* sum over data in value of results.values()[key] */
-                    
+                    var total = 0;
                     var sortedDates = _.keys(dates)
                     var difference = 0;
                     /* sort and reverse */
@@ -277,7 +277,7 @@
                     if (currentWeek != 0 && previousWeek != 0){
                         var difference = (currentWeek/previousWeek);
                     }
-                    table.row.add([value + ' Downloads', currentWeek, previousWeek, difference.toFixed(2) + ' %']).draw(false);
+                    table.row.add([value.replace('iPhone OS', 'iPad') + ' Downloads', currentWeek, previousWeek, difference.toFixed(2) + ' %']).draw(false);
                 })
             });   
             
@@ -301,7 +301,8 @@
                     if (currentWeek != 0 && previousWeek != 0){
                         var difference = (currentWeek/previousWeek)*100;
                     }
-                    table.row.add([value + ' Purchases', currentWeek, previousWeek, difference + ' %']).draw(false);
+                    
+                    table.row.add([value.replace('iPhone OS', 'iPad') + ' Purchases', currentWeek, previousWeek, difference + ' %']).draw(false);
                 })
             });   
             
