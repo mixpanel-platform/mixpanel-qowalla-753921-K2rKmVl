@@ -308,7 +308,7 @@
             /* Total + Licensed Content Purchases */
             
             
-            var purchases = MP.api.events('Licensed Content Purchases', 'Total Content Purchases', {from: moment().subtract(14, 'days'), unit: 'week')
+            var purchases = MP.api.events('Licensed Content Purchases', 'Total Content Purchases', {from: moment().subtract(14, 'days'), unit: 'week'})
             purchases.done(function(results) {
                 console.log('got results', results.values());
             });
