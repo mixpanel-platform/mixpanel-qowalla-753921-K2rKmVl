@@ -305,15 +305,14 @@
                 })
             });   
             
+            /* Total + Licensed Content Purchases */
             
             
-            
-            /*
-              _.each(_.keys(data), function(datum){
-                table.row.add([datum,data[datum]]).draw(false);
+            var purchases = MP.api.events('Licensed Content Purchases', 'Total Content Purchases', {from: moment().subtract(14, 'days'), unit: 'week')
+            purchases.done(function(results) {
+                console.log('got results', results.values());
             });
             
-            Sort by second column */
             table.order([0, 'desc']).draw();
            
 
