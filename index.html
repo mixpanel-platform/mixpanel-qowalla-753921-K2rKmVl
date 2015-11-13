@@ -228,9 +228,9 @@
             });
             
             /* Year to Date Purchases */
-            var dailyQuery = MP.api.query('/api/2.0/events/', {event:["Licensed Content Purchase","Purchase"], unit: 'year', interval:1, union:1}, {dataType: 'json'});
+            var dailyQuery = MP.api.query('/api/2.0/events/', {event:["Licensed Content Purchase","Purchase"], unit: 'month', interval:1, union:1, from: moments().subtract(12, 'months')}, {dataType: 'json'});
             dailyQuery.done(function(json){
-
+                debugger;
                 var data = _.values(json.data.values)[0];
                 var dataKeys = _.keys(data).sort().reverse()
                 var dailyActives = data[dataKeys[0]];
